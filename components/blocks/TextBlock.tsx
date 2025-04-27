@@ -4,9 +4,6 @@ import { useNode } from "@craftjs/core";
 import { useEffect, useRef } from "react";
 import BlockContainer from '../editor/BlockContainer';
 
-// Import các style Quill
-import 'react-quill/dist/quill.snow.css';
-
 export const TextBlock = ({
   text,
   fontSize,
