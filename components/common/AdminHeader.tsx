@@ -2,7 +2,7 @@
 
 import { useEditor } from "@craftjs/core";
 import { useState, useRef, useEffect } from "react";
-import { Undo2, Redo2, Save, FolderOpen, Download, Upload, Settings, Monitor, Home, Smartphone, Tablet, Laptop } from "lucide-react";
+import { Undo2, Redo2, Save, FolderOpen, Download, Upload, Settings, Monitor, Home, Smartphone, Tablet, Laptop, FileText } from "lucide-react";
 import { parseNodeTreeToHTML } from "@/utils/parseNodeTreeToHTML";
 
 // Define device presets
@@ -44,11 +44,15 @@ export const AdminHeader = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDeviceDropdown, setShowDeviceDropdown] = useState(false);
   const [currentDevice, setCurrentDevice] = useState<DeviceType>('desktop');
+  const [currentPage, setCurrentPage] = useState("home");
+  const [showPageDropdown, setShowPageDropdown] = useState(false);
   
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const deviceButtonRef = useRef<HTMLButtonElement>(null);
   const settingsDropdownRef = useRef<HTMLDivElement>(null);
   const deviceDropdownRef = useRef<HTMLDivElement>(null);
+  const pageButtonRef = useRef<HTMLButtonElement>(null);
+  const pageDropdownRef = useRef<HTMLDivElement>(null);
 
   // Handle clicks outside of dropdowns
   useEffect(() => {
@@ -74,13 +78,24 @@ export const AdminHeader = () => {
       ) {
         setShowDeviceDropdown(false);
       }
+      
+      // Close page dropdown if clicked outside
+      if (
+        showPageDropdown && 
+        pageButtonRef.current && 
+        pageDropdownRef.current && 
+        !pageButtonRef.current.contains(event.target as Node) &&
+        !pageDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowPageDropdown(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showDropdown, showDeviceDropdown]);
+  }, [showDropdown, showDeviceDropdown, showPageDropdown]);
 
   // Close dropdowns when escape key is pressed
   useEffect(() => {
@@ -88,6 +103,7 @@ export const AdminHeader = () => {
       if (event.key === 'Escape') {
         if (showDropdown) setShowDropdown(false);
         if (showDeviceDropdown) setShowDeviceDropdown(false);
+        if (showPageDropdown) setShowPageDropdown(false);
       }
     };
 
@@ -95,9 +111,9 @@ export const AdminHeader = () => {
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [showDropdown, showDeviceDropdown]);
+  }, [showDropdown, showDeviceDropdown, showPageDropdown]);
 
-  // Layout management
+  // Layout management with page support
   const handleSaveLayout = async () => {
     const serialized = query.serialize();
     const nodeTree = JSON.parse(serialized);
@@ -107,17 +123,18 @@ export const AdminHeader = () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        slug: "home",
+        slug: currentPage,
         nodeTree,
         html,
       }),
     });
   
-    showNotification("Layout saved successfully!");
+    showNotification(`Layout "${currentPage}" saved successfully!`);
   };
+
   const handleLoadLayout = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/layouts`, {
+      const response = await fetch(`/api/layouts?slug=${currentPage}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -125,22 +142,52 @@ export const AdminHeader = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch layouts');
+        throw new Error(`Failed to fetch layout for "${currentPage}"`);
       }
       
       const layouts = await response.json();
       
       if (layouts && layouts.length > 0) {
-        // Hiển thị modal để chọn layout
+        // Deserialize content vào editor
         actions.deserialize(layouts[0].content);
-        showNotification("Layout loaded successfully!");
+        showNotification(`Layout "${currentPage}" loaded successfully!`);
       } else {
-        showNotification("No saved layouts found!", "error");
+        showNotification(`No saved layout found for "${currentPage}"!`, "error");
       }
     } catch (error) {
       console.error('Error loading layout:', error);
       showNotification("Error loading layout from server!", "error");
     }
+  };
+
+  // Handle page change
+  const handlePageChange = (pageName: string) => {
+    setCurrentPage(pageName);
+    setShowPageDropdown(false);
+    
+    // Load the layout for the selected page
+    setTimeout(() => {
+      handleLoadLayout();
+    }, 100);
+  };
+
+  // Create new page
+  const handleCreateNewPage = () => {
+    const pageName = prompt("Enter new page name (lowercase, no spaces):");
+    if (!pageName) return;
+    
+    // Normalize page name: lowercase, replace spaces with hyphens
+    const normalizedName = pageName.toLowerCase().replace(/\s+/g, '-');
+    
+    setCurrentPage(normalizedName);
+    setShowPageDropdown(false);
+    
+    // Clear the canvas for the new page and save it
+    actions.deserialize('{"ROOT":{"type":{"resolvedName":"ContainerBlock"},"isCanvas":true,"props":{"backgroundColor":"#f9fafb","padding":24},"displayName":"Container","custom":{},"hidden":false,"nodes":[],"linkedNodes":{}}}');
+    
+    setTimeout(() => {
+      handleSaveLayout();
+    }, 100);
   };
 
   // Export layout as JSON file
@@ -241,7 +288,7 @@ export const AdminHeader = () => {
           <div className="flex items-center">
             <a href="/" className="flex items-center">
               <span className="text-xl font-bold text-gray-800">Page Builder</span>
-            </a>
+            </a>           
           </div>
 
           {/* Center controls */}

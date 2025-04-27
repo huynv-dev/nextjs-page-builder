@@ -1,0 +1,17 @@
+{
+  "ROOT": {
+    "type": {
+      "resolvedName": "ContainerBlock"
+    },
+    "isCanvas": true,
+    "props": {
+      "backgroundColor": "#f9fafb",
+      "padding": 24
+    },
+    "displayName": "Container",
+    "custom": {},
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  }
+}

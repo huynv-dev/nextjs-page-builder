@@ -40,7 +40,7 @@
     },
     "isCanvas": false,
     "props": {
-      "text": "<p class=\"ql-align-center\">Đây là trang portal mẫu. Bạn có thể chỉnh sửa nội dung này theo ý muốn.</p><p class=\"ql-align-center\">Hay đấy</p>",
+      "text": "<p class=\"ql-align-center\">Đây là trang portal mẫu. Bạn có thể chỉnh sửa nội dung này theo ý muốn.</p>",
       "fontSize": 18,
       "color": "#666666"
     },
@@ -51,4 +51,4 @@
     "nodes": [],
     "linkedNodes": {}
   }
-}
+} 

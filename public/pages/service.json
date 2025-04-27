@@ -1,0 +1,15 @@
+{
+  "ROOT": {
+    "type": {
+      "resolvedName": "ContainerBlock"
+    },
+    "isCanvas": true,
+    "props": {},
+    "displayName": "Container",
+    "custom": {},
+    "hidden": false,
+    "nodes": [],
+    "parent": null,
+    "linkedNodes": {}
+  }
+}

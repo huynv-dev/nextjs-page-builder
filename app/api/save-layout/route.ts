@@ -4,13 +4,11 @@ import path from 'path';
 
 export async function POST(request: NextRequest) {
   try {
-    const { slug, nodeTree, html } = await request.json();
+    // Giá trị mặc định cho slug là 'home' nếu không có trong request
+    let { slug = 'home', nodeTree, html } = await request.json();
     
     if (!slug) {
-      return NextResponse.json(
-        { error: 'Slug is required' },
-        { status: 400 }
-      );
+      slug = 'home';
     }
     
     // Đảm bảo thư mục tồn tại
@@ -28,7 +26,7 @@ export async function POST(request: NextRequest) {
     fs.writeFileSync(htmlPath, html);
     
     return NextResponse.json(
-      { success: true, message: 'Layout saved successfully' },
+      { success: true, message: `Layout "${slug}" saved successfully` },
       { status: 200 }
     );
   } catch (error) {

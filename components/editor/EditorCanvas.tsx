@@ -19,8 +19,10 @@ export const EditorCanvas = () => {
   const [mounted, setMounted] = useState(false);
   const [currentDevice, setCurrentDevice] = useState<DeviceType>('desktop');
   const [showScrollbars, setShowScrollbars] = useState(false);
+  const [currentPage, setCurrentPage] = useState<string>('home');
   const canvasRef = useRef<HTMLDivElement>(null);
   const frameContainerRef = useRef<HTMLDivElement>(null);
+  const editorInstanceRef = useRef<any>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -47,10 +49,30 @@ export const EditorCanvas = () => {
       }, 300);
     };
 
+    // Lắng nghe sự kiện chuyển trang
+    const handlePageSelected = (e: CustomEvent) => {
+      const { slug } = e.detail;
+      setCurrentPage(slug);
+      
+      // Hiện nhãn thông báo trang hiện tại
+      const pageNotification = document.createElement('div');
+      pageNotification.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50 notification-enter';
+      pageNotification.innerText = `Editing page: ${slug}`;
+      document.body.appendChild(pageNotification);
+      
+      setTimeout(() => {
+        pageNotification.classList.remove('notification-enter');
+        pageNotification.classList.add('notification-exit');
+        setTimeout(() => pageNotification.remove(), 300);
+      }, 2000);
+    };
+
     document.addEventListener('device-change', handleDeviceChange as EventListener);
+    document.addEventListener('page-selected', handlePageSelected as EventListener);
     
     return () => {
       document.removeEventListener('device-change', handleDeviceChange as EventListener);
+      document.removeEventListener('page-selected', handlePageSelected as EventListener);
     };
   }, []);
 
@@ -74,6 +96,12 @@ export const EditorCanvas = () => {
           return null;
         }
         return render;
+      }}
+      onNodesChange={(query) => {
+        // Cập nhật reference tới editor instance
+        if (!editorInstanceRef.current) {
+          editorInstanceRef.current = query;
+        }
       }}
     >
       {/* Load Layout automatically */}
@@ -104,6 +132,16 @@ export const EditorCanvas = () => {
                 </p>
               </div>
             )}
+            
+            {/* Hiển thị trang hiện tại */}
+            <div className="mt-6 p-3 bg-blue-100 rounded border border-blue-300">
+              <h3 className="text-sm font-medium text-blue-800 flex items-center">
+                <span className="ml-1.5">Current Page</span>
+              </h3>
+              <p className="text-sm font-bold text-blue-700 mt-1">
+                /{currentPage}
+              </p>
+            </div>
           </div>
 
           {/* Canvas */}

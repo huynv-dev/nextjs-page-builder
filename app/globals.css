@@ -68,6 +68,55 @@
   margin-bottom: 1em;
 }
 
+/* Quill Text Alignments */
+.quill-content .ql-align-center,
+.ql-editor .ql-align-center {
+  text-align: center;
+}
+
+.quill-content .ql-align-right,
+.ql-editor .ql-align-right {
+  text-align: right;
+}
+
+.quill-content .ql-align-justify,
+.ql-editor .ql-align-justify {
+  text-align: justify;
+}
+
+/* Quill Font Sizes */
+.quill-content .ql-size-small,
+.ql-editor .ql-size-small {
+  font-size: 0.75em;
+}
+
+.quill-content .ql-size-large,
+.ql-editor .ql-size-large {
+  font-size: 1.5em;
+}
+
+.quill-content .ql-size-huge,
+.ql-editor .ql-size-huge {
+  font-size: 2em;
+}
+
+/* Quill indent */
+.quill-content .ql-indent-1,
+.ql-editor .ql-indent-1 {
+  padding-left: 3em;
+}
+
+.quill-content .ql-indent-2,
+.ql-editor .ql-indent-2 {
+  padding-left: 6em;
+}
+
+.quill-content .ql-indent-3,
+.ql-editor .ql-indent-3 {
+  padding-left: 9em;
+}
+
+/* Quill Heading Styles */
 .quill-content h1 {
   font-size: 2em;
   font-weight: bold;
