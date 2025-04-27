@@ -1,0 +1,210 @@
+{
+  "ROOT": {
+    "type": {
+      "resolvedName": "ContainerBlock"
+    },
+    "isCanvas": true,
+    "props": {
+      "backgroundColor": "#f9fafb",
+      "padding": 24
+    },
+    "displayName": "Container",
+    "custom": {},
+    "hidden": false,
+    "nodes": [
+      "3pxALnebjG",
+      "jq7ygrU6FB",
+      "0N56S3Bbn0",
+      "EaogMCFOD6",
+      "zVSOa79wyo",
+      "UL6sBgnYzy",
+      "KcvdXX0Q9c",
+      "iMzIsmN5vw",
+      "LiSasO6OYf",
+      "pS5QONWWaD"
+    ],
+    "linkedNodes": {}
+  },
+  "jq7ygrU6FB": {
+    "type": {
+      "resolvedName": "TextBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p class=\"ql-align-center\">Xin chào các bé</p>",
+      "fontSize": 18,
+      "color": "#000000"
+    },
+    "displayName": "Text",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "3pxALnebjG": {
+    "type": {
+      "resolvedName": "TextBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p>Xin chào 1</p>",
+      "fontSize": 18,
+      "color": "#000000"
+    },
+    "displayName": "Text",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "0N56S3Bbn0": {
+    "type": {
+      "resolvedName": "TextBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p><u style=\"color: rgb(230, 0, 0);\">Animated </u><span style=\"color: rgb(230, 0, 0);\">Text</span><img src=\"data:image/png;base64,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\"></p>",
+      "fontSize": 18,
+      "color": "#000000"
+    },
+    "displayName": "Text",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "EaogMCFOD6": {
+    "type": {
+      "resolvedName": "TabsBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "tabs": [
+        {
+          "title": "Tab 1",
+          "content": "Content 1"
+        },
+        {
+          "title": "Tab 2",
+          "content": "Content 2"
+        }
+      ]
+    },
+    "displayName": "Tabs",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "UL6sBgnYzy": {
+    "type": {
+      "resolvedName": "AccordionBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "title": "Accordion Title",
+      "content": "Accordion Content"
+    },
+    "displayName": "Accordion",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "pS5QONWWaD": {
+    "type": {
+      "resolvedName": "AnimateBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p>Animated Text</p>"
+    },
+    "displayName": "Animate",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "KcvdXX0Q9c": {
+    "type": {
+      "resolvedName": "SliderBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "slides": [
+        "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "effect": "slide",
+      "autoplay": true,
+      "delay": 3000,
+      "isEditor": true
+    },
+    "displayName": "Slider",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "LiSasO6OYf": {
+    "type": {
+      "resolvedName": "SliderBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "slides": [
+        "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "effect": "slide",
+      "autoplay": true,
+      "delay": 3000,
+      "isEditor": true
+    },
+    "displayName": "Slider",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "iMzIsmN5vw": {
+    "type": {
+      "resolvedName": "TextBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p>Ngăn cách</p>",
+      "fontSize": 18,
+      "color": "#000000"
+    },
+    "displayName": "Text",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "zVSOa79wyo": {
+    "type": {
+      "resolvedName": "AnimateBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p>Animated Text</p>"
+    },
+    "displayName": "Animate",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  }
+}

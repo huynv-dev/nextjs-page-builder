@@ -1,26 +1,392 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #3b97e3; /* Màu xanh dương của floating toolbar */
+  --color-primary-light: rgba(59, 151, 227, 0.2);
+  --color-primary-medium: rgba(59, 151, 227, 0.4);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Quill Editor Styles */
+.quill {
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.ql-toolbar {
+  border-bottom: 1px solid #e5e7eb !important;
+  background-color: #f9fafb;
+  flex-wrap: wrap;
+  padding: 8px !important;
+}
+
+.ql-container {
+  font-family: inherit !important;
+  font-size: 16px !important;
+  height: auto !important;
+  min-height: 150px !important;
+}
+
+.ql-editor {
+  min-height: 150px;
+  font-family: inherit !important;
+  padding: 12px !important;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.ql-editor p {
+  margin-bottom: 8px;
+}
+
+/* Quill editor toolbar buttons */
+.ql-toolbar button {
+  margin: 0 2px;
+}
+
+.ql-toolbar .ql-formats {
+  margin-right: 8px !important;
+  margin-bottom: 5px !important;
+}
+
+/* Custom Quill editor size in settings panel */
+.settings-panel .quill {
+  max-height: none;
+}
+
+.settings-panel .ql-container {
+  max-height: 300px;
+}
+
+/* Styling for Quill content when displayed on the page */
+.quill-content {
+  font-family: inherit;
+}
+
+.quill-content p {
+  margin-bottom: 1em;
+}
+
+.quill-content h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+}
+
+.quill-content h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.83em 0;
+}
+
+.quill-content h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 1em 0;
+}
+
+.quill-content h4 {
+  font-weight: bold;
+  margin: 1.33em 0;
+}
+
+.quill-content h5 {
+  font-size: 0.83em;
+  font-weight: bold;
+  margin: 1.67em 0;
+}
+
+.quill-content h6 {
+  font-size: 0.67em;
+  font-weight: bold;
+  margin: 2.33em 0;
+}
+
+.quill-content blockquote {
+  border-left: 4px solid #ccc;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding-left: 16px;
+}
+
+.quill-content pre.ql-syntax {
+  background-color: #23241f;
+  color: #f8f8f2;
+  overflow: visible;
+  border-radius: 3px;
+  padding: 10px;
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+.quill-content code {
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-family: monospace;
+}
+
+.quill-content ul {
+  list-style-type: disc;
+  margin-left: 1.5em;
+  padding-left: 0;
+}
+
+.quill-content ol {
+  list-style-type: decimal;
+  margin-left: 1.5em;
+  padding-left: 0;
+}
+
+.quill-content a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.quill-content img {
+  max-width: 100%;
+}
+
+/* Admin Header Styles */
+.admin-header {
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+.admin-header button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-header button:not(:disabled):hover {
+  background-color: #f3f4f6;
+}
+
+/* Notification animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.notification-enter {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.notification-exit {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+/* Craft.js Node Selection and Hover Styles */
+.craftjs-node-hover {
+  position: relative;
+}
+
+.craftjs-node-hover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--color-primary); /* Giảm từ 2px xuống 1px, sử dụng biến màu */
+  pointer-events: none;
+  z-index: 9;
+}
+
+.craftjs-node-selected {
+  position: relative;
+}
+
+.craftjs-node-selected::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 1.5px solid var(--color-primary); /* Giảm từ 3px xuống 1.5px, sử dụng biến màu */
+  box-shadow: 0 0 0 2px var(--color-primary-light); /* Dùng biến màu với độ trong suốt */
+  pointer-events: none;
+  z-index: 10;
+  animation: pulseBorder 2s infinite;
+}
+
+/* Hidden element styles */
+.craft-hidden-element {
+  opacity: 0.3;
+  position: relative;
+}
+
+.craft-hidden-element::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(150, 150, 150, 0.1),
+    rgba(150, 150, 150, 0.1) 10px,
+    rgba(120, 120, 120, 0.2) 10px,
+    rgba(120, 120, 120, 0.2) 20px
+  );
+  z-index: 5;
+  pointer-events: none;
+}
+
+@keyframes pulseBorder {
+  0% {
+    box-shadow: 0 0 0 0px var(--color-primary-light);
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
+  100% {
+    box-shadow: 0 0 0 0px var(--color-primary-light);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Highlight additional controls for selected blocks */
+.craftjs-node-selected > .block-controls {
+  display: flex;
+  opacity: 1;
+}
+
+.block-controls {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Floating toolbar */
+.floating-toolbar {
+  background-color: #3b97e3;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: toolbar-appear 0.2s ease-out;
+}
+
+@keyframes toolbar-appear {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.floating-toolbar button {
+  transition: all 0.15s ease;
+}
+
+.floating-toolbar button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.floating-toolbar button:active:not(:disabled) {
+  transform: translateY(0px);
+}
+
+/* Responsive Preview Styles */
+.device-frame {
+  margin: 0 auto;
+  transition: all 0.3s ease;
+  transform-origin: top center;
+  background-color: white;
+  overflow: visible !important;
+}
+
+.device-frame.mobile {
+  border-radius: 24px;
+  border: 8px solid #333;
+  box-shadow: 0 0 0 1px #ccc, 0 25px 40px -20px rgba(0, 0, 0, 0.3);
+  overflow: visible !important;
+}
+
+.device-frame.mobile:before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background-color: #333;
+  border-radius: 0 0 8px 8px;
+}
+
+.device-frame.tablet {
+  border-radius: 12px;
+  border: 10px solid #333;
+  box-shadow: 0 0 0 1px #ccc, 0 25px 40px -20px rgba(0, 0, 0, 0.2);
+  overflow: visible !important;
+}
+
+.device-frame.desktop {
+  border: none;
+  box-shadow: none;
+  overflow: visible !important;
+}
+
+/* Device indicator */
+.device-indicator {
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 6px 0;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.device-indicator span {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Slider Block Styles */
+.slider-container {
+  position: relative;
+  overflow: visible !important;
+  z-index: 1;
+}
+
+.swiper {
+  overflow: visible !important;
+  z-index: auto !important;
+}
+
+.swiper-wrapper {
+  overflow: visible !important;
+}
+
+.swiper-slide {
+  overflow: visible !important;
+}
+
+/* Make sure slider controls are visible */
+.swiper-button-next,
+.swiper-button-prev {
+  z-index: 20 !important;
+}
+
+.swiper-pagination {
+  z-index: 20 !important;
+}
+
+/* Ensure slider is visible in all device modes */
+.device-frame .slider-container,
+.device-frame .swiper,
+.device-frame .swiper-wrapper,
+.device-frame .swiper-slide {
+  overflow: visible !important;
 }
