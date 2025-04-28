@@ -10,39 +10,22 @@
     },
     "displayName": "Container",
     "custom": {},
+    "parent": null,
     "hidden": false,
     "nodes": [
-      "portalHeader",
-      "portalContent"
+      "Az1fuNQmj0"
     ],
     "linkedNodes": {}
   },
-  "portalHeader": {
+  "Az1fuNQmj0": {
     "type": {
       "resolvedName": "TextBlock"
     },
     "isCanvas": false,
     "props": {
-      "text": "<h1 class=\"ql-align-center\">Trang Portal</h1>",
-      "fontSize": 24,
-      "color": "#333333"
-    },
-    "displayName": "Text",
-    "custom": {},
-    "parent": "ROOT",
-    "hidden": false,
-    "nodes": [],
-    "linkedNodes": {}
-  },
-  "portalContent": {
-    "type": {
-      "resolvedName": "TextBlock"
-    },
-    "isCanvas": false,
-    "props": {
-      "text": "<p class=\"ql-align-center\">Đây là trang portal mẫu. Bạn có thể chỉnh sửa nội dung này theo ý muốn.</p><p class=\"ql-align-center\">Hay đấy</p>",
+      "text": "<p>Service</p>",
       "fontSize": 18,
-      "color": "#666666"
+      "color": "#000000"
     },
     "displayName": "Text",
     "custom": {},

@@ -52,6 +52,7 @@ export const EditorCanvas = () => {
     // Lắng nghe sự kiện chuyển trang
     const handlePageSelected = (e: CustomEvent) => {
       const { slug } = e.detail;
+      console.log(`Page selected event received for: ${slug}`); // Log event reception
       setCurrentPage(slug);
       
       // Hiện nhãn thông báo trang hiện tại

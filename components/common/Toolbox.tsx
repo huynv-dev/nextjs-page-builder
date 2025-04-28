@@ -86,6 +86,13 @@ export const Toolbox = () => {
     }
   }, [layoutLoaded]);
 
+  // Re-establish connectors when the tab changes
+  useEffect(() => {
+    if (mounted) {
+      setupConnectors();
+    }
+  }, [tab, mounted]);
+
   const loadPages = async () => {
     try {
       const res = await fetch("/api/list-pages");
@@ -164,12 +171,14 @@ export const Toolbox = () => {
   };
 
   const handleSelectPage = (slug: string) => {
+    console.log(`Selecting page: ${slug}`);
     setSelectedPage(slug);
     
     // Tạo custom event để thông báo cho các component khác
     const event = new CustomEvent("page-selected", { 
       detail: { slug } 
     });
+    console.log(`Dispatching page-selected event for: ${slug}`);
     window.dispatchEvent(event);
     
     // Load layout page này

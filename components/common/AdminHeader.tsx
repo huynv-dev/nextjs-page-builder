@@ -160,36 +160,6 @@ export const AdminHeader = () => {
     }
   };
 
-  // Handle page change
-  const handlePageChange = (pageName: string) => {
-    setCurrentPage(pageName);
-    setShowPageDropdown(false);
-    
-    // Load the layout for the selected page
-    setTimeout(() => {
-      handleLoadLayout();
-    }, 100);
-  };
-
-  // Create new page
-  const handleCreateNewPage = () => {
-    const pageName = prompt("Enter new page name (lowercase, no spaces):");
-    if (!pageName) return;
-    
-    // Normalize page name: lowercase, replace spaces with hyphens
-    const normalizedName = pageName.toLowerCase().replace(/\s+/g, '-');
-    
-    setCurrentPage(normalizedName);
-    setShowPageDropdown(false);
-    
-    // Clear the canvas for the new page and save it
-    actions.deserialize('{"ROOT":{"type":{"resolvedName":"ContainerBlock"},"isCanvas":true,"props":{"backgroundColor":"#f9fafb","padding":24},"displayName":"Container","custom":{},"hidden":false,"nodes":[],"linkedNodes":{}}}');
-    
-    setTimeout(() => {
-      handleSaveLayout();
-    }, 100);
-  };
-
   // Export layout as JSON file
   const handleExportLayout = () => {
     const serializedState = query.serialize();
