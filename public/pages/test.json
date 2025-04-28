@@ -11,6 +11,25 @@
     "displayName": "Container",
     "custom": {},
     "hidden": false,
+    "nodes": [
+      "VnbgsHAV3P"
+    ],
+    "linkedNodes": {}
+  },
+  "VnbgsHAV3P": {
+    "type": {
+      "resolvedName": "TextBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p>Test</p>",
+      "fontSize": 18,
+      "color": "#000000"
+    },
+    "displayName": "Text",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
     "nodes": [],
     "linkedNodes": {}
   }

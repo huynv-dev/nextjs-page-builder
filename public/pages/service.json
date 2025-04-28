@@ -4,12 +4,34 @@
       "resolvedName": "ContainerBlock"
     },
     "isCanvas": true,
-    "props": {},
+    "props": {
+      "backgroundColor": "#f9fafb",
+      "padding": 24
+    },
     "displayName": "Container",
     "custom": {},
+    "parent": null,
+    "hidden": false,
+    "nodes": [
+      "zfU9LbaaPX"
+    ],
+    "linkedNodes": {}
+  },
+  "zfU9LbaaPX": {
+    "type": {
+      "resolvedName": "TextBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p>Service</p>",
+      "fontSize": 18,
+      "color": "#000000"
+    },
+    "displayName": "Text",
+    "custom": {},
+    "parent": "ROOT",
     "hidden": false,
     "nodes": [],
-    "parent": null,
     "linkedNodes": {}
   }
 }

@@ -4,10 +4,9 @@ import { useEditor } from "@craftjs/core";
 import { useState, useRef, useEffect } from "react";
 import { Undo2, Redo2, Save, FolderOpen, Download, Upload, Settings, Monitor, Home, Smartphone, Tablet, Laptop, FileText } from "lucide-react";
 import { parseNodeTreeToHTML } from "@/utils/parseNodeTreeToHTML";
+import { useStore, DeviceType } from '../store/useStore';
 
 // Define device presets
-export type DeviceType = 'desktop' | 'tablet' | 'mobile';
-
 interface DevicePreset {
   name: string;
   width: number;
@@ -43,9 +42,13 @@ export const AdminHeader = () => {
   
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDeviceDropdown, setShowDeviceDropdown] = useState(false);
-  const [currentDevice, setCurrentDevice] = useState<DeviceType>('desktop');
-  const [currentPage, setCurrentPage] = useState("home");
   const [showPageDropdown, setShowPageDropdown] = useState(false);
+  
+  // Get state from Zustand store
+  const currentPage = useStore((state) => state.currentPage);
+  const setCurrentPage = useStore((state) => state.setCurrentPage);
+  const currentDevice = useStore((state) => state.currentDevice);
+  const setCurrentDevice = useStore((state) => state.setCurrentDevice);
   
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const deviceButtonRef = useRef<HTMLButtonElement>(null);
@@ -201,6 +204,7 @@ export const AdminHeader = () => {
 
   // Change device size
   const handleDeviceChange = (deviceType: DeviceType) => {
+    // Update device in global store
     setCurrentDevice(deviceType);
     
     // Dispatch custom event to notify the canvas about device change

@@ -1,35 +1,35 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, forwardRef } from 'react';
 import { useNode, useEditor } from '@craftjs/core';
 import { Trash2, ArrowUpDown } from 'lucide-react';
 
-// Tạo component Button đơn giản
-const Button = ({
-  children,
-  onClick,
-  className = '',
-  ref,
-  title,
-  style,
-}: {
+// Define Button props interface
+interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
-  ref?: React.Ref<HTMLButtonElement>;
   title?: string;
   style?: React.CSSProperties;
-}) => (
-  <button
-    ref={ref as React.Ref<HTMLButtonElement>}
-    onClick={onClick}
-    className={className}
-    title={title}
-    style={style}
-  >
-    {children}
-  </button>
+}
+
+// Tạo component Button sử dụng forwardRef
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ children, onClick, className = '', title, style }, ref) => (
+    <button
+      ref={ref}
+      onClick={onClick}
+      className={className}
+      title={title}
+      style={style}
+    >
+      {children}
+    </button>
+  )
 );
+
+// Add display name for better debugging
+Button.displayName = 'Button';
 
 interface BlockContainerProps {
   children: React.ReactNode;

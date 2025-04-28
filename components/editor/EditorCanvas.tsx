@@ -11,18 +11,23 @@ import { AnimateBlock } from "../blocks/AnimateBlock";
 import { useState, useEffect, useRef } from "react";
 import { SettingsPanel } from "../common/SettingsPanel";
 import { FloatingToolbar } from "../common/FloatingToolbar";
-import { AdminHeader, devicePresets, DeviceType } from "../common/AdminHeader";
+import { AdminHeader, devicePresets } from "../common/AdminHeader";
 import { Smartphone, Tablet, Laptop } from "lucide-react";
 import { AutoLoadLayout } from "./AutoLoadLayout";
+import { useStore, DeviceType } from "../store/useStore";
 
 export const EditorCanvas = () => {
   const [mounted, setMounted] = useState(false);
-  const [currentDevice, setCurrentDevice] = useState<DeviceType>('desktop');
   const [showScrollbars, setShowScrollbars] = useState(false);
-  const [currentPage, setCurrentPage] = useState<string>('home');
   const canvasRef = useRef<HTMLDivElement>(null);
   const frameContainerRef = useRef<HTMLDivElement>(null);
   const editorInstanceRef = useRef<any>(null);
+  
+  // Get state from Zustand store
+  const currentPage = useStore((state) => state.currentPage);
+  const setCurrentPage = useStore((state) => state.setCurrentPage);
+  const currentDevice = useStore((state) => state.currentDevice);
+  const setCurrentDevice = useStore((state) => state.setCurrentDevice);
 
   useEffect(() => {
     setMounted(true);

@@ -3,6 +3,7 @@
 import { useEditor } from "@craftjs/core";
 import { useEffect, useState, useRef } from "react";
 import { usePathname } from 'next/navigation';
+import { useStore } from "../store/useStore";
 
 interface Layout {
   slug: string;
@@ -17,6 +18,11 @@ export const AutoLoadLayout = () => {
   const hasLoaded = useRef(false);
   const pathname = usePathname();
   
+  // Get state from Zustand store
+  const currentPage = useStore((state) => state.currentPage);
+  const setCurrentPage = useStore((state) => state.setCurrentPage);
+  const setLayoutLoaded = useStore((state) => state.setLayoutLoaded);
+  
   // Xác định slug từ pathname hoặc mặc định là 'home'
   const getSlugFromPath = () => {
     // Nếu là route admin, thử lấy slug từ URL
@@ -24,7 +30,7 @@ export const AutoLoadLayout = () => {
       const parts = pathname.split('/');
       return parts[parts.length - 1] || 'home';
     }
-    return 'home'; // Mặc định là home
+    return currentPage || 'home'; // Use the current page from store or default to 'home'
   };
 
   useEffect(() => {
@@ -50,6 +56,11 @@ export const AutoLoadLayout = () => {
           // Deserialize content vào editor
           actions.deserialize(targetLayout.content);
           console.log(`Loaded layout: ${targetLayout.slug}`);
+          
+          // Update store with current page and mark layout as loaded
+          setCurrentPage(targetLayout.slug);
+          setLayoutLoaded(true);
+          
           hasLoaded.current = true;
         } else {
           console.log(`No layout found for slug: ${slug}`);
@@ -62,7 +73,7 @@ export const AutoLoadLayout = () => {
     };
 
     loadLayout();
-  }, [actions, pathname]);
+  }, [actions, pathname, currentPage, setCurrentPage, setLayoutLoaded]);
 
   return null;
 };

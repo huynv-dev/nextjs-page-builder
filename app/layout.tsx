@@ -5,6 +5,7 @@ import "./globals.css";
 // Import React Quill styles ở cấp độ dự án
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
+import { WarningSupressor } from "@/components/common/WarningSupressor";
 
 const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased`}
       >
+        <WarningSupressor />
         {children}
       </body>
     </html>

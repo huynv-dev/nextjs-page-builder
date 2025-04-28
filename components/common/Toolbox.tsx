@@ -10,6 +10,7 @@ import { SliderBlock } from "../blocks/SliderBlock";
 import { AnimateBlock } from "../blocks/AnimateBlock";
 import { AccordionBlock } from "../blocks/AccordionBlock";
 import { TabsBlock } from "../blocks/TabsBlock";
+import { useStore } from "../store/useStore";
 
 interface PageMetadata {
   title: string;
@@ -31,13 +32,22 @@ export const Toolbox = () => {
   const [mounted, setMounted] = useState(false);
   const [tab, setTab] = useState<"blocks" | "pages">("blocks");
   const [pages, setPages] = useState<PageMetadata[]>([]);
-  const [selectedPage, setSelectedPage] = useState<string | null>(null);
   const [isCreatingPage, setIsCreatingPage] = useState(false);
-  const [layoutLoaded, setLayoutLoaded] = useState(false);
+
+  // Get state from Zustand store
+  const currentPage = useStore((state) => state.currentPage);
+  const setCurrentPage = useStore((state) => state.setCurrentPage);
+  const layoutLoaded = useStore((state) => state.layoutLoaded);
+  const setLayoutLoaded = useStore((state) => state.setLayoutLoaded);
 
   useEffect(() => {
     setMounted(true);
     loadPages();
+    
+    // If we already have a current page in the store, select it
+    if (currentPage && currentPage !== 'home') {
+      handleSelectPage(currentPage);
+    }
   }, []);
 
   // Thiết lập kết nối connectors
@@ -172,7 +182,7 @@ export const Toolbox = () => {
 
   const handleSelectPage = (slug: string) => {
     console.log(`Selecting page: ${slug}`);
-    setSelectedPage(slug);
+    setCurrentPage(slug);
     
     // Tạo custom event để thông báo cho các component khác
     const event = new CustomEvent("page-selected", { 
@@ -273,7 +283,7 @@ export const Toolbox = () => {
               key={page.slug}
               onClick={() => handleSelectPage(page.slug)}
               className={`cursor-pointer p-2 rounded hover:bg-gray-300 ${
-                selectedPage === page.slug ? "bg-blue-100 border-l-4 border-blue-500" : ""
+                currentPage === page.slug ? "bg-blue-100 border-l-4 border-blue-500" : ""
               }`}
             >
               <div className="font-medium">{page.title}</div>
