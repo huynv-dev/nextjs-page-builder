@@ -5,6 +5,11 @@ import { useEditor } from '@craftjs/core';
 import { RefObject, useCallback, useEffect } from 'react';
 import { useStore } from '@/components/store/useStore';
 
+// Interface for editor context
+export interface EditorContext {
+  connectors: ReturnType<typeof useEditor>['connectors'];
+}
+
 interface BlockConnectorRefs {
   textRef: RefObject<HTMLDivElement>;
   containerRef: RefObject<HTMLDivElement>;
@@ -13,6 +18,7 @@ interface BlockConnectorRefs {
   accordionRef: RefObject<HTMLDivElement>;
   tabsRef: RefObject<HTMLDivElement>;
   headingRef?: RefObject<HTMLDivElement>;
+  advancedTextRef?: RefObject<HTMLDivElement>;
   imageRef?: RefObject<HTMLDivElement>;
   videoRef?: RefObject<HTMLDivElement>;
   buttonRef?: RefObject<HTMLDivElement>;
@@ -35,26 +41,46 @@ interface BlockConnectorRefs {
  * Hook for managing block connectors in the editor
  * @param refs Object containing refs for block connectors
  * @param mounted Whether the component is mounted
+ * @param editorContext Optional editor context from parent component
  */
-export function useBlockConnectors(refs: BlockConnectorRefs, mounted: boolean) {
-  const { connectors } = useEditor();
+export function useBlockConnectors(
+  refs: BlockConnectorRefs, 
+  mounted: boolean,
+  editorContext?: EditorContext
+) {
+  // Use provided editor context or try to get from useEditor (only works within Editor component)
+  let connectors;
+  try {
+    const editor = editorContext || useEditor();
+    connectors = editor.connectors;
+  } catch (error) {
+    console.error('Editor context not available:', error);
+    // Return empty object that won't cause errors if called
+    return { setupConnectors: () => {} };
+  }
+  
   const layoutLoaded = useStore((state) => state.layoutLoaded);
   const setLayoutLoaded = useStore((state) => state.setLayoutLoaded);
   
   // Setup connectors
   const setupConnectors = useCallback(() => {
-    if (!mounted) return;
+    if (!mounted || !connectors) return;
 
     const TextBlock = require('@/components/blocks/TextBlock').TextBlock;
+    const AdvancedTextBlock = require('@/components/blocks/AdvancedTextBlock').AdvancedTextBlock;
     const ContainerBlock = require('@/components/blocks/ContainerBlock').ContainerBlock;
     const SliderBlock = require('@/components/blocks/SliderBlock').SliderBlock;
     const AnimateBlock = require('@/components/blocks/AnimateBlock').AnimateBlock;
     const AccordionBlock = require('@/components/blocks/AccordionBlock').AccordionBlock;
     const TabsBlock = require('@/components/blocks/TabsBlock').TabsBlock;
+    const HeadingBlock = require('@/components/blocks/HeadingBlock').HeadingBlock;
 
     // Set up core blocks (required)
     if (refs.textRef?.current) {
       connectors.create(refs.textRef.current, React.createElement(TextBlock, { text: "New Text" }));
+    }
+    if (refs.advancedTextRef?.current) {
+      connectors.create(refs.advancedTextRef.current, React.createElement(AdvancedTextBlock, { text: "Advanced Styled Text" }));
     }
     if (refs.containerRef?.current) {
       connectors.create(
@@ -102,9 +128,22 @@ export function useBlockConnectors(refs: BlockConnectorRefs, mounted: boolean) {
       );
     }
 
+    // Setup heading block
+    if (refs.headingRef?.current) {
+      connectors.create(
+        refs.headingRef.current, 
+        React.createElement(HeadingBlock, { 
+          text: "New Heading",
+          tag: "h2",
+          size: 24,
+          align: "left"
+        })
+      );
+    }
+
     // Additional blocks can use the same components for now
     // We'll use the TextBlock for text-like components
-    const textLikeRefs = ['headingRef', 'shortcodeRef', 'htmlRef'];
+    const textLikeRefs = ['shortcodeRef', 'htmlRef'];
     textLikeRefs.forEach(refName => {
       if (refs[refName]?.current) {
         const element = refs[refName]?.current;
@@ -159,19 +198,21 @@ export function useBlockConnectors(refs: BlockConnectorRefs, mounted: boolean) {
 
   // Initialize connectors
   useEffect(() => {
-    setupConnectors();
-  }, [setupConnectors]);
+    if (connectors) {
+      setupConnectors();
+    }
+  }, [setupConnectors, connectors]);
 
   // Re-setup connectors when layout is loaded
   useEffect(() => {
-    if (layoutLoaded) {
+    if (layoutLoaded && connectors) {
       // Set timeout to ensure editor has rendered
       setTimeout(() => {
         setupConnectors();
         setLayoutLoaded(false);
       }, 300);
     }
-  }, [layoutLoaded, setupConnectors, setLayoutLoaded]);
+  }, [layoutLoaded, setupConnectors, setLayoutLoaded, connectors]);
 
   return { setupConnectors };
 } 

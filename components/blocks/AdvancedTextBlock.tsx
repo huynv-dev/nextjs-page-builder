@@ -1,60 +1,10 @@
 "use client";
 
-import { useNode, useEditor } from "@craftjs/core";
-import { useEffect, useRef, useState } from "react";
+import { useNode } from "@craftjs/core";
+import { useEffect, useRef } from "react";
 import BlockContainer from '../editor/BlockContainer';
-import { ChevronDown } from "lucide-react";
-import dynamic from 'next/dynamic';
-import { CSSProperties } from 'react';
 
-// Dynamically import React Quill
-const ReactQuill = dynamic(() => import('react-quill'), { 
-  ssr: false,
-  loading: () => <div className="border p-2 rounded h-40 flex items-center justify-center text-gray-400">Loading editor...</div>
-});
-
-// Import React Quill styles
-import 'react-quill/dist/quill.snow.css';
-
-// Define proper interface for TextBlock props
-interface TextBlockProps {
-  text: string;
-  // Typography
-  fontSize?: number;
-  lineHeight?: number;
-  fontWeight?: string | number;
-  fontStyle?: string;
-  fontFamily?: string;
-  letterSpacing?: number;
-  textAlign?: 'left' | 'center' | 'right' | 'justify';
-  textDecoration?: string;
-  textTransform?: 'none' | 'capitalize' | 'uppercase' | 'lowercase';
-  // Colors
-  color?: string;
-  backgroundColor?: string;
-  // Spacing
-  padding?: number;
-  margin?: number;
-  // Border
-  borderWidth?: number;
-  borderStyle?: string;
-  borderColor?: string;
-  borderRadius?: number;
-  // Shadow
-  shadowColor?: string;
-  shadowBlur?: number;
-  shadowOffsetX?: number;
-  shadowOffsetY?: number;
-  // Advanced
-  zIndex?: string | number;
-  opacity?: number;
-  maxWidth?: number | null;
-}
-
-// Type for settings section names
-type SectionName = 'typography' | 'colors' | 'spacing' | 'border' | 'shadow' | 'advanced';
-
-export const TextBlock = ({
+export const AdvancedTextBlock = ({
   text,
   // Typography
   fontSize,
@@ -86,7 +36,7 @@ export const TextBlock = ({
   zIndex,
   opacity,
   maxWidth,
-}: TextBlockProps) => {
+}) => {
   const { connectors: { connect, drag } } = useNode();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -94,7 +44,7 @@ export const TextBlock = ({
     if (ref.current) {
       ref.current.innerHTML = text;
       
-      // Add necessary CSS classes for elements created from Quill
+      // Thêm các lớp CSS cần thiết cho các phần tử được tạo từ Quill
       const codeBlocks = ref.current.querySelectorAll('pre');
       codeBlocks.forEach(block => {
         if (!block.classList.contains('ql-syntax')) {
@@ -111,7 +61,7 @@ export const TextBlock = ({
   }, [connect, drag]);
   
   // Construct style object
-  const style: CSSProperties = {
+  const style = {
     // Typography
     fontSize: fontSize ? `${fontSize}px` : undefined,
     lineHeight: lineHeight ? lineHeight : undefined,
@@ -154,7 +104,7 @@ export const TextBlock = ({
   );
 };
 
-TextBlock.craft = {
+AdvancedTextBlock.craft = {
   props: {
     text: "Edit me in settings panel",
     // Typography
@@ -188,18 +138,18 @@ TextBlock.craft = {
     opacity: 1,
     maxWidth: null,
   },
-  displayName: "Text",
+  displayName: "Advanced Text",
   related: {
-    settings: TextBlockSettings
+    settings: AdvancedTextSettings
   }
 };
 
-// Define settings component for TextBlock
-function TextBlockSettings() {
+// Định nghĩa component cài đặt tùy chỉnh cho AdvancedTextBlock
+function AdvancedTextSettings() {
   const { actions, selected, nodes } = useEditor((state) => {
     const currentNodeId = state.events.selected;
-    let currentNode = null;
-    if (currentNodeId && typeof currentNodeId === 'string') {
+    let currentNode;
+    if (currentNodeId) {
       currentNode = state.nodes[currentNodeId];
     }
     return {
@@ -208,14 +158,7 @@ function TextBlockSettings() {
     };
   });
 
-  const [openSections, setOpenSections] = useState<{
-    typography: boolean;
-    colors: boolean;
-    spacing: boolean;
-    border: boolean;
-    shadow: boolean;
-    advanced: boolean;
-  }>({
+  const [openSections, setOpenSections] = useState({
     typography: true,
     colors: false,
     spacing: false,
@@ -224,7 +167,7 @@ function TextBlockSettings() {
     advanced: false
   });
 
-  const toggleSection = (section: SectionName) => {
+  const toggleSection = (section) => {
     setOpenSections(prev => ({
       ...prev,
       [section]: !prev[section]
@@ -237,39 +180,11 @@ function TextBlockSettings() {
 
   const props = nodes.data.props;
 
-  const handlePropChange = (propName: string, value: any) => {
-    if (typeof selected === 'string') {
-      actions.setProp(selected, (props: any) => {
-        props[propName] = value;
-      });
-    }
+  const handlePropChange = (propName, value) => {
+    actions.setProp(selected, (props) => {
+      props[propName] = value;
+    });
   };
-
-  // Quill editor configuration
-  const quillModules = {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      ['blockquote', 'code-block'],
-      [{ 'header': 1 }, { 'header': 2 }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],
-      [{ 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'direction': 'rtl' }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'font': [] }],
-      [{ 'align': [] }],
-      ['clean'],
-      ['link', 'image']
-    ]
-  };
-
-  const quillFormats = [
-    'bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block',
-    'header', 'list', 'script', 'indent', 'direction', 'size',
-    'color', 'background', 'font', 'align', 'clean', 'link', 'image'
-  ];
 
   return (
     <div className="space-y-4">
@@ -392,7 +307,7 @@ function TextBlockSettings() {
               <select
                 className="border p-2 rounded w-full"
                 value={props.textAlign}
-                onChange={(e) => handlePropChange('textAlign', e.target.value as 'left' | 'center' | 'right' | 'justify')}
+                onChange={(e) => handlePropChange('textAlign', e.target.value)}
               >
                 <option value="left">Left</option>
                 <option value="center">Center</option>
@@ -418,7 +333,7 @@ function TextBlockSettings() {
               <select
                 className="border p-2 rounded w-full"
                 value={props.textTransform}
-                onChange={(e) => handlePropChange('textTransform', e.target.value as 'none' | 'capitalize' | 'uppercase' | 'lowercase')}
+                onChange={(e) => handlePropChange('textTransform', e.target.value)}
               >
                 <option value="none">None</option>
                 <option value="capitalize">Capitalize</option>
@@ -714,4 +629,45 @@ function TextBlockSettings() {
       </div>
     </div>
   );
-} 
+}
+
+// Thêm import cần thiết ở đầu file
+import { useEditor } from "@craftjs/core";
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import dynamic from 'next/dynamic';
+
+// Dynamically import React Quill
+const ReactQuill = dynamic(() => import('react-quill'), { 
+  ssr: false,
+  loading: () => <div className="border p-2 rounded h-40 flex items-center justify-center text-gray-400">Loading editor...</div>
+});
+
+// Import React Quill styles
+import 'react-quill/dist/quill.snow.css';
+
+// Quill editor configuration
+const quillModules = {
+  toolbar: [
+    ['bold', 'italic', 'underline', 'strike'],
+    ['blockquote', 'code-block'],
+    [{ 'header': 1 }, { 'header': 2 }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    [{ 'indent': '-1'}, { 'indent': '+1' }],
+    [{ 'direction': 'rtl' }],
+    [{ 'size': ['small', false, 'large', 'huge'] }],
+    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    [{ 'color': [] }, { 'background': [] }],
+    [{ 'font': [] }],
+    [{ 'align': [] }],
+    ['clean'],
+    ['link', 'image']
+  ]
+};
+
+const quillFormats = [
+  'bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block',
+  'header', 'list', 'script', 'indent', 'direction', 'size',
+  'color', 'background', 'font', 'align', 'clean', 'link', 'image'
+]; 

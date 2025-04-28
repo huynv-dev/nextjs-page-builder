@@ -3,7 +3,7 @@
 import { useEditor } from "@craftjs/core";
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Eye, EyeOff, Square } from 'lucide-react';
+import { ChevronDown, ChevronUp, Eye, EyeOff, Square, PanelLeft, Layout, Type, Image, FileText } from 'lucide-react';
 
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { 
@@ -15,9 +15,13 @@ const ReactQuill = dynamic(() => import('react-quill'), {
 import 'react-quill/dist/quill.snow.css';
 
 // Tabs for Settings Panel
-type SettingsTab = 'properties' | 'layers';
+type SettingsTab = 'style' | 'layers';
 
-export const SettingsPanel = () => {
+interface SettingsPanelProps {
+  activeTab?: SettingsTab;
+}
+
+export const SettingsPanel = ({ activeTab = 'style' }: SettingsPanelProps) => {
   const { actions, selected, nodes } = useEditor((state) => {
     const currentNodeId = Array.from(state.events.selected)[0];
     let currentNode;
@@ -31,7 +35,6 @@ export const SettingsPanel = () => {
   });
 
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<SettingsTab>('properties');
 
   useEffect(() => {
     setMounted(true);
@@ -78,7 +81,7 @@ export const SettingsPanel = () => {
     return (
       <div key={nodeId} style={{ marginLeft: `${level * 16}px` }}>
         <div 
-          className={`flex items-center p-2 hover:bg-gray-100 ${isSelected ? 'bg-primary-light' : ''}`}
+          className={`flex items-center p-2 hover:bg-gray-100 rounded ${isSelected ? 'bg-primary/10 text-primary' : ''}`}
           onClick={() => {
             actions.selectNode(nodeId);
           }}
@@ -98,7 +101,7 @@ export const SettingsPanel = () => {
           )}
           
           <button 
-            className="mr-2 text-gray-500 hover:text-gray-700"
+            className={`mr-2 hover:text-primary ${isHidden ? 'text-gray-400' : 'text-gray-500'}`}
             onClick={(e) => {
               e.stopPropagation();
               // Toggle hidden property
@@ -131,14 +134,15 @@ export const SettingsPanel = () => {
   const getLayerIcon = (nodeData: any) => {
     const type = nodeData.displayName?.toLowerCase() || '';
     
-    if (type.includes('text')) return <span className="text-gray-700">T</span>;
-    if (type.includes('container')) return <Square size={16} className="text-gray-700" />;
-    if (type.includes('slider')) return <span className="text-gray-700">🖼️</span>;
-    if (type.includes('accordion')) return <span className="text-gray-700">▼</span>;
-    if (type.includes('tabs')) return <span className="text-gray-700">⎍</span>;
-    if (type.includes('animate')) return <span className="text-gray-700">✨</span>;
+    if (type.includes('text')) return <FileText size={16} className="text-primary/70" />;
+    if (type.includes('heading')) return <Type size={16} className="text-primary/70" />;
+    if (type.includes('container')) return <Layout size={16} className="text-primary/70" />;
+    if (type.includes('image')) return <Image size={16} className="text-primary/70" />;
+    if (type.includes('slider')) return <PanelLeft size={16} className="text-primary/70" />;
+    if (type.includes('accordion')) return <ChevronDown size={16} className="text-primary/70" />;
+    if (type.includes('tabs')) return <Square size={16} className="text-primary/70" />;
     
-    return <Square size={16} className="text-gray-700" />;
+    return <Square size={16} className="text-primary/70" />;
   };
 
   // Get the root node ID
@@ -147,7 +151,13 @@ export const SettingsPanel = () => {
   // Create a function to render the Properties panel
   const renderProperties = () => {
     if (!selected || !nodes) {
-      return <div className="text-gray-400">Select a block to edit settings</div>;
+      return (
+        <div className="flex flex-col items-center justify-center h-full p-8 text-center text-gray-400">
+          <Square size={32} className="mb-2 text-gray-300" />
+          <p className="text-sm">Select a block to edit settings</p>
+          <p className="text-xs mt-2">Click on any element in the canvas to customize it</p>
+        </div>
+      );
     }
 
     const nodeData = nodes.data;
@@ -164,7 +174,7 @@ export const SettingsPanel = () => {
       <div className="space-y-6">
         {/* Component Name */}
         <div className="mb-4">
-          <span className="inline-block px-2 py-1 bg-primary-light text-primary rounded text-sm font-medium">
+          <span className="inline-block px-2 py-1 bg-primary/10 text-primary rounded text-sm font-medium">
             {nodeData.displayName}
           </span>
         </div>
@@ -172,7 +182,7 @@ export const SettingsPanel = () => {
         {/* Text Content with Rich Text Editor */}
         {mounted && "text" in props && (
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium">Text Content</label>
+            <label className="text-sm font-medium text-gray-700">Text Content</label>
             <div className="border rounded">
               <ReactQuill 
                 value={props.text} 
@@ -189,10 +199,10 @@ export const SettingsPanel = () => {
         {/* Font Size */}
         {"fontSize" in props && (
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium">Font Size (px)</label>
+            <label className="text-sm font-medium text-gray-700">Font Size (px)</label>
             <input
               type="number"
-              className="border p-2 rounded"
+              className="border p-2 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
               value={props.fontSize}
               onChange={(e) => handlePropChange('fontSize', Number(e.target.value))}
             />
@@ -202,36 +212,52 @@ export const SettingsPanel = () => {
         {/* Text Color */}
         {"color" in props && (
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium">Text Color</label>
-            <input
-              type="color"
-              className="border p-2 rounded"
-              value={props.color}
-              onChange={(e) => handlePropChange('color', e.target.value)}
-            />
+            <label className="text-sm font-medium text-gray-700">Text Color</label>
+            <div className="flex items-center">
+              <input
+                type="color"
+                className="w-10 h-10 border p-1 rounded-l"
+                value={props.color}
+                onChange={(e) => handlePropChange('color', e.target.value)}
+              />
+              <input 
+                type="text"
+                className="border p-2 rounded-r flex-1 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                value={props.color}
+                onChange={(e) => handlePropChange('color', e.target.value)}
+              />
+            </div>
           </div>
         )}
 
         {/* Background Color */}
         {"backgroundColor" in props && (
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium">Background Color</label>
-            <input
-              type="color"
-              className="border p-2 rounded"
-              value={props.backgroundColor}
-              onChange={(e) => handlePropChange('backgroundColor', e.target.value)}
-            />
+            <label className="text-sm font-medium text-gray-700">Background Color</label>
+            <div className="flex items-center">
+              <input
+                type="color"
+                className="w-10 h-10 border p-1 rounded-l"
+                value={props.backgroundColor}
+                onChange={(e) => handlePropChange('backgroundColor', e.target.value)}
+              />
+              <input 
+                type="text"
+                className="border p-2 rounded-r flex-1 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                value={props.backgroundColor}
+                onChange={(e) => handlePropChange('backgroundColor', e.target.value)}
+              />
+            </div>
           </div>
         )}
 
         {/* Padding */}
         {"padding" in props && (
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium">Padding (px)</label>
+            <label className="text-sm font-medium text-gray-700">Padding (px)</label>
             <input
               type="number"
-              className="border p-2 rounded"
+              className="border p-2 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
               value={props.padding}
               onChange={(e) => handlePropChange('padding', Number(e.target.value))}
             />
@@ -241,38 +267,40 @@ export const SettingsPanel = () => {
         {/* Slides for SliderBlock */}
         {"slides" in props && Array.isArray(props.slides) && (
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium">Slides (URLs)</label>
+            <label className="text-sm font-medium text-gray-700">Slides (URLs)</label>
             {props.slides.map((slide: string, index: number) => (
               <div key={index} className="flex items-center mb-1">
                 <input
                   type="text"
-                  className="border p-2 rounded flex-1 mr-1"
+                  className="border p-2 rounded flex-1 mr-1 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                   value={slide}
                   onChange={(e) => {
-                    const newSlides = [...props.slides];
-                    newSlides[index] = e.target.value;
-                    handlePropChange('slides', newSlides);
+                    actions.setProp(selected, (props: any) => {
+                      props.slides[index] = e.target.value;
+                    });
                   }}
                 />
                 <button
-                  className="p-1 text-red-500 hover:bg-red-100 rounded"
+                  className="p-1 bg-red-50 text-red-500 rounded hover:bg-red-100"
                   onClick={() => {
-                    const newSlides = [...props.slides];
-                    newSlides.splice(index, 1);
-                    handlePropChange('slides', newSlides);
+                    actions.setProp(selected, (props: any) => {
+                      props.slides.splice(index, 1);
+                    });
                   }}
                 >
-                  ×
+                  Remove
                 </button>
               </div>
             ))}
             <button
-              className="px-2 py-1 bg-primary-light text-primary rounded text-sm"
+              className="mt-2 p-2 bg-primary/10 text-primary rounded hover:bg-primary/20"
               onClick={() => {
-                handlePropChange('slides', [...props.slides, 'https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1000&auto=format&fit=crop']);
+                actions.setProp(selected, (props: any) => {
+                  props.slides.push('https://via.placeholder.com/600x400');
+                });
               }}
             >
-              + Add Slide
+              Add Slide
             </button>
           </div>
         )}
@@ -280,32 +308,19 @@ export const SettingsPanel = () => {
     );
   };
 
-  return (
-    <div className="space-y-2 settings-panel">
-      {/* Tabs */}
-      <div className="flex border-b mb-4">
-        <button
-          className={`py-2 px-4 text-sm font-medium ${activeTab === 'properties' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('properties')}
-        >
-          Properties
-        </button>
-        <button
-          className={`py-2 px-4 text-sm font-medium ${activeTab === 'layers' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('layers')}
-        >
-          Layers
-        </button>
-      </div>
-
-      {/* Content based on active tab */}
-      {activeTab === 'properties' && renderProperties()}
-      
-      {activeTab === 'layers' && (
-        <div className="border rounded bg-white max-h-[500px] overflow-y-auto">
-          {renderLayers(rootNodeId)}
+  if (activeTab === "layers") {
+    return (
+      <div className="h-full">
+        {/* Layers Tree */}
+        <div className="mb-4">
+          <div className="mb-2 text-sm font-medium text-gray-700">Page Structure</div>
+          <div className="border rounded bg-white">
+            {rootNodeId && renderLayers(rootNodeId)}
+          </div>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  return renderProperties();
 };

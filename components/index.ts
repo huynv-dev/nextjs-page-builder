@@ -15,7 +15,7 @@ export { EditorCanvas } from './editor/EditorCanvas';
 export { AutoLoadLayout } from './editor/AutoLoadLayout';
 
 // Editor Tools
-export { Toolbox } from './editor/tools/Toolbox';
+export { SafeToolbox as Toolbox } from './editor/tools/SafeToolbox';
 export { BlocksTab } from './editor/tools/BlocksTab';
 export { PagesTab } from './editor/tools/PagesTab';
 

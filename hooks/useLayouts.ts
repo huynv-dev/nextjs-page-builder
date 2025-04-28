@@ -7,10 +7,49 @@ import { showNotification } from '@/utils/notifications';
 import { useStore } from '@/components/store/useStore';
 
 /**
- * Hook for managing layouts
+ * Interface for editor actions and query
  */
-export function useLayouts() {
-  const { actions, query } = useEditor();
+export interface EditorContext {
+  actions: ReturnType<typeof useEditor>['actions'];
+  query: ReturnType<typeof useEditor>['query'];
+}
+
+/**
+ * Hook for managing layouts
+ * Can be used outside of Editor context if editorContext is provided
+ */
+export function useLayouts(editorContext?: EditorContext) {
+  // Use provided editor context or try to get from useEditor hook if available
+  let actions, query;
+  
+  try {
+    // This will throw an error if called outside Editor context
+    const editor = editorContext || useEditor();
+    actions = editor.actions;
+    query = editor.query;
+  } catch (error) {
+    console.error('Editor context not available:', error);
+    // Return functions that don't cause errors when called
+    return {
+      handleSaveLayout: () => {
+        showNotification('Error: Editor context not available', "error");
+        return Promise.resolve(false);
+      },
+      handleLoadLayout: () => {
+        showNotification('Error: Editor context not available', "error");
+        return Promise.resolve(false);
+      },
+      handleExportLayout: () => {
+        showNotification('Error: Editor context not available', "error");
+        return false;
+      },
+      handleImportLayout: () => {
+        showNotification('Error: Editor context not available', "error");
+        return false;
+      }
+    };
+  }
+  
   const currentPage = useStore((state) => state.currentPage);
   
   /**
@@ -25,12 +64,15 @@ export function useLayouts() {
       
       if (result.success) {
         showNotification(`Layout "${currentPage}" saved successfully!`);
+        return true;
       } else {
         showNotification(`Error saving layout: ${result.error}`, "error");
+        return false;
       }
     } catch (error) {
       console.error('Error saving layout:', error);
       showNotification('Error saving layout', "error");
+      return false;
     }
   }, [query, currentPage]);
   
@@ -102,6 +144,7 @@ export function useLayouts() {
       reader.readAsText(file);
     };
     input.click();
+    return true;
   }, [actions]);
   
   return {

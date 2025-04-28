@@ -3,11 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { 
   FileText, 
-  Layout, 
   Image, 
-  Clock, 
-  List, 
-  Columns, 
   Grid, 
   Type, 
   Play,
@@ -19,11 +15,11 @@ import {
   Anchor,
   Sidebar,
   MoreHorizontal,
-  Share2,
-  Table,
-  Aperture
+  Aperture,
+  Text
 } from 'lucide-react';
 import { useBlockConnectors } from '@/hooks/useBlockConnectors';
+import { useEditor } from '@craftjs/core';
 
 interface BlocksTabProps {
   mounted: boolean;
@@ -45,6 +41,7 @@ interface BlockCategory {
 export const BlocksTab = ({ mounted, searchQuery = "" }: BlocksTabProps) => {
   // Create refs for blocks
   const textRef = useRef<HTMLDivElement>(null);
+  const advancedTextRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLDivElement>(null);
@@ -93,8 +90,11 @@ export const BlocksTab = ({ mounted, searchQuery = "" }: BlocksTabProps) => {
   };
   
   // Setup block connectors
+  const editor = useEditor();
+  const editorContext = { connectors: editor.connectors };
   useBlockConnectors({
     textRef,
+    advancedTextRef,
     headingRef,
     imageRef,
     videoRef,
@@ -113,11 +113,10 @@ export const BlocksTab = ({ mounted, searchQuery = "" }: BlocksTabProps) => {
     menuRef,
     sidebarRef,
     readMoreRef,
-    // Add missing required refs
     containerRef,
     sliderRef,
     animateRef
-  }, mounted);
+  }, mounted, editorContext);
   
   // Define block categories
   const blockCategories: BlockCategory[] = [
@@ -127,7 +126,8 @@ export const BlocksTab = ({ mounted, searchQuery = "" }: BlocksTabProps) => {
         {
           name: 'Heading',
           icon: <Type size={18} />,
-          ref: headingRef
+          ref: headingRef,
+          description: 'Section heading with multiple formatting options'
         },
         {
           name: 'Image',
@@ -138,6 +138,12 @@ export const BlocksTab = ({ mounted, searchQuery = "" }: BlocksTabProps) => {
           name: 'Text Editor',
           icon: <FileText size={18} />,
           ref: textRef
+        },
+        {
+          name: 'Advanced Text',
+          icon: <Text size={18} />,
+          ref: advancedTextRef,
+          description: 'Rich text with advanced styling options'
         },
         {
           name: 'Video',
