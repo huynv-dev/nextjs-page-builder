@@ -11,10 +11,14 @@ import { AnimateBlock } from "../blocks/AnimateBlock";
 import { useState, useEffect, useRef } from "react";
 import { SettingsPanel } from "../common/SettingsPanel";
 import { FloatingToolbar } from "../common/FloatingToolbar";
-import { AdminHeader, devicePresets } from "../common/AdminHeader";
+import { AdminHeader } from "../common/AdminHeader";
 import { Smartphone, Tablet, Laptop } from "lucide-react";
 import { AutoLoadLayout } from "./AutoLoadLayout";
-import { useStore, DeviceType } from "../store/useStore";
+import { useStore } from "../store/useStore";
+import { devicePresets } from "@/constants/devices";
+import { useDevice } from "@/hooks/useDevice";
+import { showPageChangeNotification } from "@/utils/notifications";
+import { DeviceType } from "@/types/editor.types";
 
 export const EditorCanvas = () => {
   const [mounted, setMounted] = useState(false);
@@ -26,8 +30,16 @@ export const EditorCanvas = () => {
   // Get state from Zustand store
   const currentPage = useStore((state) => state.currentPage);
   const setCurrentPage = useStore((state) => state.setCurrentPage);
-  const currentDevice = useStore((state) => state.currentDevice);
-  const setCurrentDevice = useStore((state) => state.setCurrentDevice);
+  
+  // Use the device hook
+  const { currentDevice, setCurrentDevice, isDeviceFrame } = useDevice();
+
+  // Set up local device icons for the UI
+  const deviceIcon = {
+    desktop: <Laptop size={16} />,
+    tablet: <Tablet size={16} />,
+    mobile: <Smartphone size={16} />,
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -36,10 +48,13 @@ export const EditorCanvas = () => {
     const handleDeviceChange = (e: CustomEvent) => {
       const deviceDetails = e.detail;
       const deviceType = Object.keys(devicePresets).find(
-        device => devicePresets[device as DeviceType].width === deviceDetails.width
-      ) as DeviceType;
+        device => devicePresets[device as keyof typeof devicePresets].width === deviceDetails.width
+      ) as DeviceType | undefined;
       
-      setCurrentDevice(deviceType);
+      if (deviceType) {
+        setCurrentDevice(deviceType);
+      }
+      
       setShowScrollbars(false);
       
       // When device changes, ensure the frame is properly updated for sliders
@@ -54,23 +69,14 @@ export const EditorCanvas = () => {
       }, 300);
     };
 
-    // Lắng nghe sự kiện chuyển trang
+    // Listen for page change events
     const handlePageSelected = (e: CustomEvent) => {
       const { slug } = e.detail;
-      console.log(`Page selected event received for: ${slug}`); // Log event reception
+      console.log(`Page selected event received for: ${slug}`);
       setCurrentPage(slug);
       
-      // Hiện nhãn thông báo trang hiện tại
-      const pageNotification = document.createElement('div');
-      pageNotification.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg z-50 notification-enter';
-      pageNotification.innerText = `Editing page: ${slug}`;
-      document.body.appendChild(pageNotification);
-      
-      setTimeout(() => {
-        pageNotification.classList.remove('notification-enter');
-        pageNotification.classList.add('notification-exit');
-        setTimeout(() => pageNotification.remove(), 300);
-      }, 2000);
+      // Show page change notification
+      showPageChangeNotification(slug);
     };
 
     document.addEventListener('device-change', handleDeviceChange as EventListener);
@@ -80,18 +86,13 @@ export const EditorCanvas = () => {
       document.removeEventListener('device-change', handleDeviceChange as EventListener);
       document.removeEventListener('page-selected', handlePageSelected as EventListener);
     };
-  }, []);
+  }, [setCurrentDevice, setCurrentPage]);
 
   if (!mounted) {
     return <div className="flex h-screen bg-gray-100">Loading editor...</div>;
   }
 
   const deviceFrame = currentDevice !== 'desktop';
-  const deviceIcon = {
-    desktop: <Laptop size={16} />,
-    tablet: <Tablet size={16} />,
-    mobile: <Smartphone size={16} />,
-  };
 
   return (
     <Editor 

@@ -13,7 +13,8 @@
     "hidden": false,
     "nodes": [
       "portalHeader",
-      "portalContent"
+      "portalContent",
+      "uY1Gq8Xbix"
     ],
     "linkedNodes": {}
   },
@@ -50,5 +51,22 @@
     "hidden": false,
     "nodes": [],
     "linkedNodes": {}
+  },
+  "uY1Gq8Xbix": {
+    "type": {
+      "resolvedName": "TextBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "<p>ưeweww</p>",
+      "fontSize": 18,
+      "color": "#000000"
+    },
+    "displayName": "Text",
+    "custom": {},
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
   }
-} 
+}

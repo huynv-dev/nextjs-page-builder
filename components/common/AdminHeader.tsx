@@ -1,39 +1,13 @@
 "use client";
 
+import React from 'react';
 import { useEditor } from "@craftjs/core";
 import { useState, useRef, useEffect } from "react";
-import { Undo2, Redo2, Save, FolderOpen, Download, Upload, Settings, Monitor, Home, Smartphone, Tablet, Laptop, FileText } from "lucide-react";
-import { parseNodeTreeToHTML } from "@/utils/parseNodeTreeToHTML";
-import { useStore, DeviceType } from '../store/useStore';
-
-// Define device presets
-interface DevicePreset {
-  name: string;
-  width: number;
-  height: number;
-  icon: React.ReactNode;
-}
-
-export const devicePresets: Record<DeviceType, DevicePreset> = {
-  desktop: {
-    name: 'Desktop',
-    width: 1920,
-    height: 1080,
-    icon: <Laptop size={20} />
-  },
-  tablet: {
-    name: 'Tablet',
-    width: 768,
-    height: 1024,
-    icon: <Tablet size={20} />
-  },
-  mobile: {
-    name: 'Mobile',
-    width: 375,
-    height: 667,
-    icon: <Smartphone size={20} />
-  }
-};
+import { Undo2, Redo2, Save, FolderOpen, Download, Upload, Settings, Monitor, Home, Smartphone, Tablet, Laptop } from "lucide-react";
+import { useStore } from '@/components/store/useStore';
+import { useDevice } from '@/hooks/useDevice';
+import { useLayouts } from '@/hooks/useLayouts';
+import { devicePresets } from '@/constants/devices';
 
 export const AdminHeader = () => {
   const { actions, query, enabled } = useEditor((state) => ({
@@ -44,11 +18,10 @@ export const AdminHeader = () => {
   const [showDeviceDropdown, setShowDeviceDropdown] = useState(false);
   const [showPageDropdown, setShowPageDropdown] = useState(false);
   
-  // Get state from Zustand store
+  // Get state from hooks
   const currentPage = useStore((state) => state.currentPage);
-  const setCurrentPage = useStore((state) => state.setCurrentPage);
-  const currentDevice = useStore((state) => state.currentDevice);
-  const setCurrentDevice = useStore((state) => state.setCurrentDevice);
+  const { currentDevice, handleDeviceChange } = useDevice();
+  const { handleSaveLayout, handleLoadLayout, handleExportLayout, handleImportLayout } = useLayouts();
   
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const deviceButtonRef = useRef<HTMLButtonElement>(null);
@@ -116,108 +89,6 @@ export const AdminHeader = () => {
     };
   }, [showDropdown, showDeviceDropdown, showPageDropdown]);
 
-  // Layout management with page support
-  const handleSaveLayout = async () => {
-    const serialized = query.serialize();
-    const nodeTree = JSON.parse(serialized);
-    const html = parseNodeTreeToHTML(nodeTree);
-  
-    await fetch("/api/save-layout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        slug: currentPage,
-        nodeTree,
-        html,
-      }),
-    });
-  
-    showNotification(`Layout "${currentPage}" saved successfully!`);
-  };
-
-  const handleLoadLayout = async () => {
-    try {
-      const response = await fetch(`/api/layouts?slug=${currentPage}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch layout for "${currentPage}"`);
-      }
-      
-      const layouts = await response.json();
-      
-      if (layouts && layouts.length > 0) {
-        // Deserialize content vào editor
-        actions.deserialize(layouts[0].content);
-        showNotification(`Layout "${currentPage}" loaded successfully!`);
-      } else {
-        showNotification(`No saved layout found for "${currentPage}"!`, "error");
-      }
-    } catch (error) {
-      console.error('Error loading layout:', error);
-      showNotification("Error loading layout from server!", "error");
-    }
-  };
-
-  // Export layout as JSON file
-  const handleExportLayout = () => {
-    const serializedState = query.serialize();
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(serializedState));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "page-layout.json");
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-    showNotification("Layout exported as JSON!");
-    setShowDropdown(false); // Close dropdown after action
-  };
-
-  // Import layout from JSON file
-  const handleImportLayout = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const jsonData = JSON.parse(event.target?.result as string);
-          actions.deserialize(jsonData);
-          showNotification("Layout imported successfully!");
-        } catch (error) {
-          showNotification("Error importing layout: Invalid file format", "error");
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-    setShowDropdown(false); // Close dropdown after action
-  };
-
-  // Change device size
-  const handleDeviceChange = (deviceType: DeviceType) => {
-    // Update device in global store
-    setCurrentDevice(deviceType);
-    
-    // Dispatch custom event to notify the canvas about device change
-    const deviceChangeEvent = new CustomEvent('device-change', {
-      detail: devicePresets[deviceType]
-    });
-    
-    document.dispatchEvent(deviceChangeEvent);
-    setShowDeviceDropdown(false);
-    
-    showNotification(`Switched to ${devicePresets[deviceType].name} view`);
-  };
-
   // Editor actions
   const handleUndo = () => {
     if (query.history.canUndo()) {
@@ -238,20 +109,26 @@ export const AdminHeader = () => {
     });
   };
 
-  // Display notification
-  const showNotification = (message: string, type: "success" | "error" = "success") => {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-20 right-4 p-3 rounded-md shadow-lg z-50 notification-enter ${
-      type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-    }`;
-    notification.innerText = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.classList.remove('notification-enter');
-      notification.classList.add('notification-exit');
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
+  // Handle device switcher
+  const onDeviceChange = (deviceType: string) => {
+    handleDeviceChange(deviceType as any);
+    setShowDeviceDropdown(false);
+  };
+
+  // Handle dropdown closing
+  const handleExportAndClose = () => {
+    handleExportLayout();
+    setShowDropdown(false);
+  };
+
+  const handleImportAndClose = () => {
+    handleImportLayout();
+    setShowDropdown(false);
+  };
+
+  // Handle load layout button
+  const onLoadLayout = () => {
+    handleLoadLayout(currentPage);
   };
 
   return (
@@ -292,7 +169,7 @@ export const AdminHeader = () => {
               <Save size={20} />
             </button>
             <button 
-              onClick={handleLoadLayout} 
+              onClick={onLoadLayout} 
               className="p-2 rounded-md hover:bg-gray-100 text-gray-700"
               title="Load Layout"
             >
@@ -327,22 +204,45 @@ export const AdminHeader = () => {
                   className="absolute mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
                 >
                   <div className="py-1" role="menu">
-                    {(Object.keys(devicePresets) as DeviceType[]).map((deviceType) => (
-                      <button
-                        key={deviceType}
-                        onClick={() => handleDeviceChange(deviceType)}
-                        className={`flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 ${
-                          currentDevice === deviceType ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
-                        }`}
-                        role="menuitem"
-                      >
-                        <span className="mr-2">{devicePresets[deviceType].icon}</span>
-                        {devicePresets[deviceType].name}
-                        <span className="ml-auto text-xs text-gray-400">
-                          {devicePresets[deviceType].width}px
-                        </span>
-                      </button>
-                    ))}
+                    <button
+                      onClick={() => onDeviceChange('desktop')}
+                      className={`flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 ${
+                        currentDevice === 'desktop' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                      }`}
+                      role="menuitem"
+                    >
+                      <span className="mr-2">{React.createElement(Laptop, { size: 16 })}</span>
+                      Desktop
+                      <span className="ml-auto text-xs text-gray-400">
+                        1920px
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => onDeviceChange('tablet')}
+                      className={`flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 ${
+                        currentDevice === 'tablet' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                      }`}
+                      role="menuitem"
+                    >
+                      <span className="mr-2">{React.createElement(Tablet, { size: 16 })}</span>
+                      Tablet
+                      <span className="ml-auto text-xs text-gray-400">
+                        768px
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => onDeviceChange('mobile')}
+                      className={`flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 ${
+                        currentDevice === 'mobile' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                      }`}
+                      role="menuitem"
+                    >
+                      <span className="mr-2">{React.createElement(Smartphone, { size: 16 })}</span>
+                      Mobile
+                      <span className="ml-auto text-xs text-gray-400">
+                        375px
+                      </span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -370,7 +270,7 @@ export const AdminHeader = () => {
                 >
                   <div className="py-1" role="menu" aria-orientation="vertical">
                     <button
-                      onClick={handleExportLayout}
+                      onClick={handleExportAndClose}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       role="menuitem"
                     >
@@ -378,7 +278,7 @@ export const AdminHeader = () => {
                       Export Layout
                     </button>
                     <button
-                      onClick={handleImportLayout}
+                      onClick={handleImportAndClose}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       role="menuitem"
                     >
